@@ -148,6 +148,9 @@ def generate_query_node(state: AgentState):
             - **Payments**: contains details about payments made or received.
         - **Employees**
             - **Employee Details**: contains information about company employees.
+        - **Sales**
+            - **Souda**: contains details of sales orders including broker name, party name, rate, order quantity, pending quantity, order status, and brand name. It may be asked as sauda or souda
+            - **ORDERS**: contains details of dispatched orders including party name, transporter name, vehicle number, delivery term, brand name, and dispatch quantity.
     - Do not take table as there names suggest. Use the above guide to get the relevant table.
     - When user asks query based on some identity, that can be present in other tables, and there is no previous context for choosing a table, give data, or all occurances.
     ------------------------
