@@ -130,8 +130,12 @@ def generate_query_node(state: AgentState):
 
     --- Database Descriptions ---
     - When a user asks about "tasks" or "kaam", they are referring to entries where a table has fields relevant to tasks, like "TaskID", or "Task Description". You MUST query one of given tables that is related to tasks. DO NOT invent or query a non-existent table named "tasks".
-    - When a user asks about "orders" or "po", they are usually referring to entries where a table has fields relevant to Purchase Orders like "Quantity", "PO Number" or "Indent Number".
+    - When a user asks about "po", they are usually referring to entries where a table has fields relevant to Purchase Orders like "Quantity", "PO Number".
+    - When a user asks about "orders", they are usually referring to entries where a table has fields relevant to Orders like "Dispatch Quantity", "Order Number", "Transporter Name" and "Brand Name".
+    - When a user asks about "Employee", they are usually referring to entries where a table has fields relevant to Employee Details like "Designation", "Name as per Aadhar", "Mobile Number" and "SKA-Joining ID".
+    - When a user asks about "Store OUT", they are usually referring to entries where a table has fields relevant to Store OUT like "Store Out Number", "Indentor Name", "Department", "Area", "Product Name ", "Quantity" and "Amount".
     - When a user refers to sheets they are actually talking about tables.
+
     - When user asks for report, they are usually demanding a sumamry of the data relevant to the context along side sample rows.The summary should include data like, total rows, total completed, total pending, total amount, total amount pending, etc. this should be specific to the sheet in question
     - The database deals with several types of data: Tasks, Purchase Orders, Sales, Production, Inventory, Finance, Employees, and Enquiries.
     - Here is a list of tables that fall in each category:
