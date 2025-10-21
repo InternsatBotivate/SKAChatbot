@@ -134,6 +134,9 @@ def generate_query_node(state: AgentState):
     - When a user asks about "orders", they are usually referring to entries where a table has fields relevant to Orders like "Dispatch Quantity", "Order Number", "Transporter Name" and "Brand Name".
     - When a user asks about "Employee", they are usually referring to entries where a table has fields relevant to Employee Details like "Designation", "Name as per Aadhar", "Mobile Number" and "SKA-Joining ID".
     - When a user asks about "Store OUT", they are usually referring to entries where a table has fields relevant to Store OUT like "Store Out Number", "Indentor Name", "Department", "Area", "Product Name ", "Quantity" and "Amount".
+    - When a user asks about "Store IN", they are usually referring to entries where a table has fields relevant to Store IN like "Indent Number", "What", "Product Name", "Vendor Name", "Rate ", "Quantity" and "Payment Term".
+    - When a user asks about "Souda", they are usually referring to entries where a table has fields relevant to Souda like "Sauda Number", "Indentor Name", "Date Of Sauda", "Area", "Broker Name", "Party Name", "Delear Name", "Rate", "Order Quantity (Ton)", "Total Dispatch Qty", "Pending Qty", "Order Cancel Qty", "Sauda Status" and "Brand Name".
+    - When a user asks about "INVOICE/invoice", they are usually referring to entries where a table has fields relevant to INVOICE  like "Unique No", "Order Number", "Party Name", "Sauda No.", "Do No.", "Bill Date", "Bill No.", "Bill Image", "Delivery Term", "Tramsporter Name", "Pending Qty", "Vehicle No.", "LR-Number", "Bill Status", "Size", "Section", "Qty", "Rate", "Customer Discount" and "UDAAN/VIDHAN". 
     - When a user refers to sheets they are actually talking about tables.
 
     - When user asks for report, they are usually demanding a sumamry of the data relevant to the context along side sample rows.The summary should include data like, total rows, total completed, total pending, total amount, total amount pending, etc. this should be specific to the sheet in question
@@ -148,13 +151,11 @@ def generate_query_node(state: AgentState):
         - **Inventory**
             - **Store OUT**: records materials issued from the store.
             - **Store IN**: records materials received into the store.
-        - **Finance**
-            - **Payments**: contains details about payments made or received.
         - **Employees**
-            - **Employee Details**: contains information about company employees.
+            -**Active Employee Details**: contains detailed information about active company employees, including joining ID, name, father's name, date of joining, designation, address, date of birth, gender, mobile number, bank account details, email, qualification, and department.
         - **Sales**
             - **Souda**: contains details of sales orders including broker name, party name, rate, souda/sauda quantity, pending quantity, sauda/souda status, and brand name. It may be asked as sauda or souda
-            - **ORDERS**: contains details of dispatched orders including party name, transporter name, vehicle number, delivery term, brand name, dispatch quantity and order status.
+            - **INVOICE **: contains details of invoices including party name, order number, bill number, bill date, transporter name, vehicle number, delivery term, brand name (UDAAN/VIDHAN), quantity, rate, and bill status.
     - Do not take table as there names suggest. Use the above guide to get the relevant table.
     - When user asks query based on some identity, that can be present in other tables, and there is no previous context for choosing a table, give data, or all occurances.
     ------------------------
