@@ -118,7 +118,6 @@ def generate_query_node(state: AgentState):
 
     system_prompt = """You are an AI expert in writing PostgreSQL queries.
     Given a user question and conversation history, create a syntactically correct PostgreSQL query.
-    The query should be in its simplest form.
     The query should fullfill user's query.
     The query should work on the given schema.
     {schema}
@@ -130,7 +129,7 @@ def generate_query_node(state: AgentState):
 
     --- Database Descriptions ---
     - When a user asks about "tasks" or "kaam", they are referring to entries where a table has fields relevant to tasks, like "TaskID", or "Task Description". You MUST query one of given tables that is related to tasks. DO NOT invent or query a non-existent table named "tasks".
-    - When a user asks about "po", they are usually referring to entries where a table has fields relevant to Purchase Orders like "Quantity", "PO Number".
+    - When a user asks about "po pending" or "pending po", they are referring to the Purchase orders that are pending.
     - When a user asks about "orders", they are usually referring to entries where a table has fields relevant to Orders like "Dispatch Quantity", "Order Number", "Transporter Name" and "Brand Name".
     - When a user asks about "Employee", they are usually referring to entries where a table has fields relevant to Employee Details like "Designation", "Name as per Aadhar", "Mobile Number" and "SKA-Joining ID".
     - When a user asks about "Store OUT", they are usually referring to entries where a table has fields relevant to Store OUT like "Store Out Number", "Indentor Name", "Department", "Area", "Product Name ", "Quantity" and "Amount".
@@ -167,8 +166,24 @@ def generate_query_node(state: AgentState):
     - **IMPORTANT:** Only return the SQL query. Do not add any other text or explanation.
     - **IMPORTANT:** If a table or column name contains a space or is a reserved keyword, you MUST wrap it in double quotes. For example: "Task Description".
     - **IMPORTANT:** Use the columns provided in the schema, if user mention a column that is not in schema, try to find the closest relevant column in the schema.
-    - **IMPORTANT:** When user asks for report, give details like total number of column, total amount pending, total pending, total completed, etc. based on the columns in the table, that can be used to create a report. And also show 5 to 7 sample rows, which should right joined to the report.
-    - **IMPORTANT:** Never do `SELECT *` for reports without limits. Reports should only contain aggregate data and few sample rows. 
+
+    
+    --- Instructions ---
+    - Report queries should include
+    - Total number of relevant entries
+    - Total amount pending (if applicable)
+    - Total completed (if applicable)
+    - Total pending (if applicable)
+    - Other relevant data points based on the columns in the table.
+    - Not all data points are directly available from columns names, some data points need to be generated using SQL functions like COUNT, SUM, etc. on relevant columns.
+    - And a small table with aggregate data based on given by, vendors or parties showing insight on the data. Though data points are more important.
+    - Calculate quantities, amounts, etc. based on different columns in the table. For example, 
+        - total amount pending can be calculated using SUM of "Amount" column where "Status" is 'Pending'.
+        - total quantity can be calculated using different columns of the row related to quantity like "Quantity", "Total Lifted", "Order Cancelled Quantity", etc. ex Pending Quantity = Quantity - Total Lifted Quantity.
+        - Make sure to calculate these data not just SUM("COLUMN_NAME") everywhere.
+        - Add comments in the SQL query to explain your logic where necessary.
+    - Make sure that the output of SQL query gives all data at once. Only give one query.
+    --------------------
     """
 
     if "Error:" in state.get("result", ""):
@@ -214,13 +229,22 @@ def execute_query_node(state: AgentState):
 
 def summarize_result_node(state: AgentState):
     """Takes the query result and creates a natural language answer."""
+    system_prompt = """
+    You are a helpful AI assistant, Diya. 
+    Your job is to answer the user's question in concise manner, based on the data provided, which should be easy and fast to read, with markup and lists and tables if needed. 
+    Only reply in English or Hindi based on user's question. 
+    Do not give any clarification about how you got the result. 
+    Never reply with more than 20 rows of data, whether that be in list or tables.
+    Show data points in readable format.
+    All currencies are in Rupees until mentioned otherwise. Show the relevant units wherever possible.
+    Keep the large numbers in human readable format, and use indian number system (lakhs, crores) and commas.
+    In reports, based on data points, give bite sized insights on the data. Bold the important numbers and details.
+    Show information related to all rows seprately, if needed use tables or lists in reports.
+    """
     print("--- Summarizing Result ---")
     prompt = ChatPromptTemplate.from_messages(
         [
-            (
-                "system",
-                "You are a helpful AI assistant, Diya. Your job is to answer the user's question in concise manner, based on the data provided, which should be easy and fast to read, with markup and lists and tables if needed. Only reply in English or Hindi based on user's question. Do not give any clarification about how you got the result. When details too big, for examples in reports and big data fetches, give summary like Number of Pending, Number of Completed, Total number of rows, and other stuff like total amount, total amount to be paid, etc. Never give more than 20 rows of data, whether that be in list or tables.",
-            ),
+            ("system", system_prompt),
             (
                 "human",
                 """Based on the user's question: "{question}"
