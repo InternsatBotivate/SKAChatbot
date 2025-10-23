@@ -95,7 +95,7 @@ def handle_conversation_node(state: AgentState):
         [
             (
                 "system",
-                "You are a friendly assistant solves user's database related queries, Diya, for Mr.Abhishek, you refer him as Mr. Abhishek. Reply to the user politely with a short relevant relevant response. Reply in English or Hindi based on user's question. All currencies are in Rupees until mentioned other wise. Greet user according to current time, i.e., 'Good Morning', 'Good Evening', etc. when needed. Don't just greet on every response.",
+                "You are a friendly assistant solves user's database related queries, Diya, for Mr. Abhishek, you refer him as Abhishek Sir. Reply to the user politely with a short relevant relevant response. Reply in English or Hindi based on user's question. All currencies are in Rupees until mentioned other wise. Greet user according to current time, i.e., 'Good Morning', 'Good Evening', etc. when needed. Don't just greet on every response. Show the units when needed.",
             ),
             MessagesPlaceholder(variable_name="chat_history"),
             ("human", "{question}"),
@@ -139,7 +139,6 @@ def generate_query_node(state: AgentState):
     - When a user asks about "INVOICE/invoice", they are usually referring to entries where a table has fields relevant to INVOICE  like "Unique No", "Order Number", "Party Name", "Sauda No.", "Do No.", "Bill Date", "Bill No.", "Bill Image", "Delivery Term", "Tramsporter Name", "Pending Qty", "Vehicle No.", "LR-Number", "Bill Status", "Size", "Section", "Qty", "Rate", "Customer Discount" and "UDAAN/VIDHAN". 
     - When a user refers to sheets they are actually talking about tables.
 
-    - When user asks for report, they are usually demanding a sumamry of the data relevant to the context along side sample rows.The summary should include data like, total rows, total completed, total pending, total amount, total amount pending, etc. this should be specific to the sheet in question
     - The database deals with several types of data: Tasks, Purchase Orders, Sales, Production, Inventory, Finance, Employees, and Enquiries.
     - Here is a list of tables that fall in each category:
         - **Tasks**
@@ -168,6 +167,7 @@ def generate_query_node(state: AgentState):
     - **IMPORTANT:** Only return the SQL query. Do not add any other text or explanation.
     - **IMPORTANT:** If a table or column name contains a space or is a reserved keyword, you MUST wrap it in double quotes. For example: "Task Description".
     - **IMPORTANT:** Use the columns provided in the schema, if user mention a column that is not in schema, try to find the closest relevant column in the schema.
+    - **IMPORTANT:** When user asks for report, give details like total number of column, total amount pending, total pending, total completed, etc. based on the columns in the table, that can be used to create a report. And also show 5 to 7 sample rows, which should right joined to the report.
     """
 
     if "Error:" in state.get("result", ""):
@@ -218,7 +218,7 @@ def summarize_result_node(state: AgentState):
         [
             (
                 "system",
-                "You are a helpful AI assistant, Diya. Your job is to answer the user's question in concise manner, based on the data provided, which should be easy and fast to read, with markup and lists and tables if needed. Only reply in English or Hindi based on user's question. Do not give any clarification about how you got the result. When datais too big,for examples in reports and big data fetches, give summary like Number of Pending, Number of Completed, Total number of rows, and other stuff like total amount, total amount to be paid, etc. Basically a summary of the data. Never give more than 20 rows of data, whether that be in list or tables.",
+                "You are a helpful AI assistant, Diya. Your job is to answer the user's question in concise manner, based on the data provided, which should be easy and fast to read, with markup and lists and tables if needed. Only reply in English or Hindi based on user's question. Do not give any clarification about how you got the result. When details too big, for examples in reports and big data fetches, give summary like Number of Pending, Number of Completed, Total number of rows, and other stuff like total amount, total amount to be paid, etc. Never give more than 20 rows of data, whether that be in list or tables.",
             ),
             (
                 "human",
@@ -250,7 +250,7 @@ def handle_error_node(state: AgentState):
         [
             (
                 "system",
-                "You are a helpful AI assistant, Diya, for a SQL database. The query you generated failed multiple times. Just say to the user that you couldn't find the answer. Resturn small easy to read with markup response. All currencies are in Rupees until mentioned other wise.",
+                "You are a helpful AI assistant, Diya, for a SQL database. The query you generated failed multiple times. Just say to the user that you couldn't find the answer. Return small easy to read with markup response. All currencies are in Rupees until mentioned other wise.",
             ),
             (
                 "human",
