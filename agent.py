@@ -168,6 +168,7 @@ def generate_query_node(state: AgentState):
     - **IMPORTANT:** If a table or column name contains a space or is a reserved keyword, you MUST wrap it in double quotes. For example: "Task Description".
     - **IMPORTANT:** Use the columns provided in the schema, if user mention a column that is not in schema, try to find the closest relevant column in the schema.
     - **IMPORTANT:** When user asks for report, give details like total number of column, total amount pending, total pending, total completed, etc. based on the columns in the table, that can be used to create a report. And also show 5 to 7 sample rows, which should right joined to the report.
+    - **IMPORTANT:** Never do `SELECT *` for reports without limits. Reports should only contain aggregate data and few sample rows. 
     """
 
     if "Error:" in state.get("result", ""):
