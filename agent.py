@@ -183,6 +183,8 @@ def generate_query_node(state: AgentState):
         - Make sure to calculate these data not just SUM("COLUMN_NAME") everywhere.
         - Add comments in the SQL query to explain your logic where necessary.
     - Make sure that the output of SQL query gives all data at once. Only give one query.
+    - Make sure to query in limits, as there is a lot of data in the tables. And the limits should make sense for the question asked.
+    - The limits should give wrong data for the user's query. Still it should not query 1000s of rows.
     --------------------
     """
 
