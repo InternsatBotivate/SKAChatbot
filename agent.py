@@ -156,6 +156,7 @@ def generate_query_node(state: AgentState):
             - **INVOICE **: contains details of invoices including party name, order number, bill number, bill date, transporter name, vehicle number, delivery term, brand name (UDAAN/VIDHAN), quantity, rate, and bill status.
     - Do not take table as there names suggest. Use the above guide to get the relevant table.
     - When user asks query based on some identity, that can be present in other tables, and there is no previous context for choosing a table, give data, or all occurances.
+    - When user asks pending tasks, makes sure to only give pending tasks till now. No pending tasks in future dates.
     ------------------------
     
     --- Data Dictionary ---
