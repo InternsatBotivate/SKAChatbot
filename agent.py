@@ -205,7 +205,6 @@ def generate_query_node(state: AgentState):
             ("human", "{question}"),
         ]
     )
-    llm = ChatOpenAI(model="o4-mini")
     runnable = prompt | llm
     raw_query = runnable.invoke(
         {
