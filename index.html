@@ -160,6 +160,13 @@
             overflow-x: auto;          /* Allows horizontal scrolling for wide elements like tables */
             overflow-wrap: break-word; /* Wraps long, unbreakable words to prevent text overflow */
         }
+        
+        /* --- NEW: Added style for loading message --- */
+        .message-content .loading-text p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
 
         .message.user .message-content {
             background-color: #E8EAF6;
@@ -371,6 +378,22 @@
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
 
+        // --- NEW: Loading Animation Variables ---
+        let loadingInterval;
+        const loadingMessages = [
+            "Please wait while your query is being executed...",
+            "Connecting to the database...",
+            "Running the analysis...",
+            "This may take a moment, the query is complex.",
+            "Compiling your report...",
+            "Almost there, gathering the final details...",
+            "Just a few more seconds...",
+            "Finalizing the results...",
+            "Thanks for your patience, this is a large query.",
+            "Getting your answer ready!"
+        ];
+        // --- END NEW ---
+
         // --- EVENT LISTENERS ---
         sendButton.addEventListener('click', sendMessage);
         messageInput.addEventListener('keydown', (e) => {
@@ -398,6 +421,11 @@
             const loadingMessage = addMessage('bot', createLoadingAnimation());
             const currentChatHistory = buildChatHistory();
 
+            // --- NEW: Start the text animation ---
+            // Show the 3 dots for 1 second, then start the text animation
+            setTimeout(() => startLoadingAnimation(loadingMessage), 1000);
+            // --- END NEW ---
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -407,6 +435,10 @@
                         chat_history: currentChatHistory
                     })
                 });
+
+                // --- NEW: Stop the animation on response ---
+                stopLoadingAnimation();
+                // --- END NEW ---
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -419,6 +451,9 @@
                 loadingMessage.querySelector('.message-content').innerHTML = parsedHtml;
 
             } catch (error) {
+                // --- NEW: Stop the animation on error ---
+                stopLoadingAnimation();
+                // --- END NEW ---
                 console.error("Error fetching chat response:", error);
                 loadingMessage.querySelector('.message-content').innerHTML = `<p>⚠️ An error occurred. Please try again later.</p>`;
             } finally {
@@ -457,6 +492,40 @@
             `;
         }
 
+        // --- NEW: Function to start the loading text animation ---
+        function startLoadingAnimation(loadingElement) {
+            let index = 0;
+            const contentElement = loadingElement.querySelector('.message-content');
+            
+            // Clear any old interval just in case
+            if (loadingInterval) {
+                clearInterval(loadingInterval);
+            }
+
+            // Function to update text
+            const updateText = () => {
+                const msg = loadingMessages[index % loadingMessages.length];
+                contentElement.innerHTML = `<div class="loading-text"><p>${msg}</p></div>`;
+                index++;
+                scrollToBottom();
+            };
+
+            // Immediately show the first message
+            updateText();
+            
+            // Set a new interval to change the message
+            loadingInterval = setInterval(updateText, 5000); // Change message every 3 seconds
+        }
+
+        // --- NEW: Function to stop the loading animation ---
+        function stopLoadingAnimation() {
+            if (loadingInterval) {
+                clearInterval(loadingInterval);
+                loadingInterval = null;
+            }
+        }
+        // --- END NEW ---
+
         function buildChatHistory() {
             const history = [];
             const allMessages = Array.from(messageList.querySelectorAll('.message'));
@@ -467,6 +536,7 @@
             
             for (const msg of recentMessages) {
                 const type = msg.classList.contains('user') ? 'human' : 'ai';
+                // Get innerText to avoid capturing the loading animation HTML
                 const content = msg.querySelector('.message-content').innerText;
                 if (content) {
                     history.push({ type, content });
